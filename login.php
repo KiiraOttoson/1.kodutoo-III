@@ -20,12 +20,14 @@
 	$create_email = "";
 	$create_password = "";
 	
-if(isset($_POST["login"])){ // 3. Kui POST meetodil on saabunud "login" element. Kuhu saabunud (aadressi reale "login" ju ei ilmu)?:
+if ($_SERVER["REQUEST_METHOD"] == "POST") { // 6.Server request kontrollib, kas vorm oli saadetud POST meetodil (mitte GET, or PUT). Isset kontrollib sama ning lisaks kontrollib kas login/create oli vajutatud. Milleks on vaja lisada Server Request Method, kui isset teeb ära sama töö?
+	
+	if(isset($_POST["login"])){ // 3. Kui POST meetodil on saabunud "login" element. Kuhu saabunud (aadressi reale "login" ju ei ilmu)?. 
 	
 	if(empty($_POST["email"])){
 					$email_error = " *Palun sisesta E-post!"; //4. Siin määratud tekst saadetakse  muutujate juurde ""; vahele, kust see läheb htmli sektsiooni ja kuvatakse email välja järel.
 				}else{
-		$email=($_POST["email"]);	// ei ole vahet kas kasutada $_POST või $_REQUEST. Kas $_POSTi sees on juba $_REQUEST olemas?		
+		$email = test_input($_POST["email"]);	
 		}
 		
 	if(empty($_POST["password"])){
@@ -34,7 +36,7 @@ if(isset($_POST["login"])){ // 3. Kui POST meetodil on saabunud "login" element.
 				if(strlen($_POST["password"]) < 6 ){ // Kontrollib pikkust
 				$password_error = " *Salasõna pikkus peab olema vähemalt 6 sümbolit!";
 				}else{
-				/////
+				$password = test_input($_POST["password"]);
 		}
 		}
 	  
@@ -50,7 +52,7 @@ if(isset($_POST["create"])){ // Sama asi create vormi jaoks
 	if(empty($_POST["create_email"])){
 	  $create_email_error = " *Palun sisesta E-post!";
 	}else{
-	  $create_email=($_POST["create_email"]);
+	  $create_email = test_input($_POST["create_email"]);
 	  }
   
 	if(empty($_POST["create_password"])){
@@ -59,7 +61,7 @@ if(isset($_POST["create"])){ // Sama asi create vormi jaoks
 	  if(strlen($_POST["create_password"]) < 6 ){
 	  $create_password_error = " *Parooli pikkus peab olema vähemalt 6 sümbolit!";
 	}else{
-	  $create_password=($_POST["create_password"]);
+	 $create_password = test_input($_POST["create_password"]);
 	  }
 	  }
 	  
@@ -68,6 +70,14 @@ if(isset($_POST["create"])){ // Sama asi create vormi jaoks
 				}
 				
 } //if isset create ends
+}// if server request ends
+
+function test_input($data) { // 7. puhastab muutujad üleliigsetest sümbolitest. htmlspecialchars kontrollib, et ei ole häkitud skripte vms, sügavam sisu jäi arusaamatuks. 
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
 ?>
 
 <html>
@@ -79,7 +89,7 @@ if(isset($_POST["create"])){ // Sama asi create vormi jaoks
 
 <h2>Sisselogimine</h2>
 
-<form action="login.php" method="post">
+<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
 
 	<input type="email" name="email" placeholder="E-post" value="<?php echo $email; ?>"><?php echo $email_error; ?><br><br>
 	<input type="password" name="password" placeholder="Parool"><?php echo $password_error; ?><br><br>
@@ -88,7 +98,7 @@ if(isset($_POST["create"])){ // Sama asi create vormi jaoks
 </form>
 
 	<h2>Registreerumine</h2>
-<form action="login.php" method="post">
+<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
 	
 		Sisestage E-post:<br><input type= "email" name="create_email" value="<?php echo $create_email; ?>"><?php echo $create_email_error; ?><br><br>
 		Valige parool:<br><input type= "password" name="create_password"><?php echo $create_password_error; ?><br><br>
