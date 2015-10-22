@@ -13,12 +13,16 @@
 	$password_error = "";
 	$create_email_error = "";
 	$create_password_error = "";
+	$create_s_name_error ="";
+	$create_f_name_error="";
 
 // muutujad väärtuste jaoks
 	$email = "";
 	$password = "";
 	$create_email = "";
 	$create_password = "";
+	$create_s_name ="";
+	$create_f_name="";
 	
 if ($_SERVER["REQUEST_METHOD"] == "POST") { // 6.Server request kontrollib, kas vorm oli saadetud POST meetodil (mitte GET, or PUT). Isset kontrollib sama ning lisaks kontrollib kas login/create oli vajutatud. Milleks on vaja lisada Server Request Method, kui isset teeb ära sama töö?
 	
@@ -40,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // 6.Server request kontrollib, kas 
 		}
 		}
 	  
-		if($password_error == "" && $email_error == ""){ //5. Kui errorid jäävad tühjaks, siis anna teade. == is equal, comparison operator. Miks siin lihtsalt = ei kasutata?
+		if($password_error == "" && $email_error == "" ){ //5. Kui errorid jäävad tühjaks, siis anna teade. == is equal, comparison operator. Miks siin lihtsalt = ei kasutata?
 					echo "Kasutaja ".$email." logitakse sisse";
 				}
 				
@@ -49,6 +53,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // 6.Server request kontrollib, kas 
 
 if(isset($_POST["create"])){ // Sama asi create vormi jaoks
 
+	if(empty($_POST["create_s_name"])){
+	  $create_s_name_error = " *Palun sisesta eesnimi!";
+	}else{
+	  $create_s_name = test_input($_POST["create_s_name"]);
+	  }
+	
+	
+	if(empty($_POST["create_f_name"])){
+	  $create_f_name_error = " *Palun sisesta perekonnanimi!";
+	}else{
+	  $create_f_name = test_input($_POST["create_f_name"]);
+	  }
+	
+	
 	if(empty($_POST["create_email"])){
 	  $create_email_error = " *Palun sisesta E-post!";
 	}else{
@@ -65,14 +83,15 @@ if(isset($_POST["create"])){ // Sama asi create vormi jaoks
 	  }
 	  }
 	  
-		if($create_password_error == "" && $create_email_error == ""){
-					echo "Olete registreerunud! Teie E-post on ".$create_email." ja parool on ".$create_password;
+		
+		if($create_password_error == "" && $create_email_error == "" && $create_s_name_error == "" && $create_f_name_error == ""){
+					echo "Tere ".$create_s_name."! Olete registreerunud! Teie E-post on ".$create_email." ja parool on ".$create_password;
 				}
 				
 } //if isset create ends
 }// if server request ends
 
-function test_input($data) { // 7. puhastab muutujad üleliigsetest sümbolitest. htmlspecialchars kontrollib, et ei ole häkitud skripte vms, sügavam sisu jäi arusaamatuks. 
+function test_input($data) { // 7. puhastab muutujad üleliigsetest sümbolitest. htmlspecialchars kontrollib, et ei ole häkitud skripte vms, sügavam sisu jäi arusaamatuks. Kas test_input ja clean_input on sisuliselt samad?
   $data = trim($data);
   $data = stripslashes($data);
   $data = htmlspecialchars($data);
@@ -100,7 +119,9 @@ function test_input($data) { // 7. puhastab muutujad üleliigsetest sümbolitest
 	<h2>Registreerumine</h2>
 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
 	
-		Sisestage E-post:<br><input type= "email" name="create_email" value="<?php echo $create_email; ?>"><?php echo $create_email_error; ?><br><br>
+		Eesnimi:<br><input type="text" name="create_s_name" value="<?php echo $create_s_name; ?>"><?php echo $create_s_name_error; ?><br><br>
+		Perekonnanimi:<br><input type="text" name="create_f_name" value="<?php echo $create_f_name; ?>"><?php echo $create_f_name_error; ?><br><br>
+		E-post:<br><input type= "email" name="create_email" value="<?php echo $create_email; ?>"><?php echo $create_email_error; ?><br><br>
 		Valige parool:<br><input type= "password" name="create_password"><?php echo $create_password_error; ?><br><br>
 		<input type="submit" name="create" value= "Loo kasutaja">
 </form>
